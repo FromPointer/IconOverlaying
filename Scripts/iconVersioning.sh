@@ -49,10 +49,13 @@ fi;
 #version="3.4"
 #build_num="9999"
 
+year_mouth_day=`date "+%Y-%m-%d"`
+hour_minute_second=`date "+%H-%M-%S"`
+
 shopt -s extglob
 build_num="${build_num##*( )}"
 shopt -u extglob
-caption="${version} ($build_num)\n${branch}\n${commit}"
+caption="${version} ($build_num)\n${year_mouth_day}\n${hour_minute_second}"
 echo $caption
 
 function abspath() { pushd . > /dev/null; if [ -d "$1" ]; then cd "$1"; dirs -l +0; else cd "`dirname \"$1\"`"; cur_dir=`dirs -l +0`; if [ "$cur_dir" == "/" ]; then echo "$cur_dir`basename \"$1\"`"; else echo "$cur_dir/`basename \"$1\"`"; fi; fi; popd > /dev/null; }
@@ -105,7 +108,7 @@ function processIcon() {
 
     width=`identify -format %w ${base_path}`
     height=`identify -format %h ${base_path}`
-    band_height=$((($height * 47) / 100))
+    band_height=$((($height * 60) / 100))
     band_position=$(($height - $band_height))
     text_position=$(($band_position - 3))
     point_size=$(((13 * $width) / 100))
@@ -118,7 +121,7 @@ function processIcon() {
     convert ${base_path} -blur 10x8 /tmp/blurred.png
     convert /tmp/blurred.png -gamma 0 -fill white -draw "rectangle 0,$band_position,$width,$height" /tmp/mask.png
     convert -size ${width}x${band_height} xc:none -fill 'rgba(0,0,0,0.2)' -draw "rectangle 0,0,$width,$band_height" /tmp/labels-base.png
-    convert -background none -size ${width}x${band_height} -pointsize $point_size -fill white -gravity center -gravity South caption:"$caption" /tmp/labels.png
+    convert -background none -size ${width}x${band_height} -pointsize $point_size -fill red -gravity center -gravity South caption:"$caption" /tmp/labels.png
 
     convert ${base_path} /tmp/blurred.png /tmp/mask.png -composite /tmp/temp.png
 
